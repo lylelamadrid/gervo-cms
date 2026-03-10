@@ -79,16 +79,107 @@ const WEEKLY_CHECKLIST = [
   { id: "wc14", phase: "A", task: "Photo documentation submitted?", type: "documentation" },
 ];
 
+// Total contract = Main Structure ₱5,830,536.03 + Basement Additional ₱610,854.72 = ₱6,441,390.75
+const TOTAL_CONTRACT = 6441390.75;
+const BASEMENT_ADDITIONAL = 610854.72;
+
 const PROGRESS_BILLINGS = [
-  { id: "pb1", billing: "1st Progress Billing", date: "2025-09-15", amount: 583054, status: "paid", description: "Mobilization + Foundation Works" },
-  { id: "pb2", billing: "2nd Progress Billing", date: "2025-11-17", amount: 583054, status: "paid", description: "Structural Works GF + Columns" },
-  { id: "pb3", billing: "3rd Progress Billing", date: "2026-01-22", amount: 583054, status: "paid", description: "2F Slab + CHB Works" },
-  { id: "pb4", billing: "4th Progress Billing", date: "2026-03-11", amount: 583054, status: "pending", description: "Roofing + GF Slab" },
-  { id: "pb5", billing: "5th Progress Billing", date: "2026-05-01", amount: 583054, status: "upcoming", description: "Walls + MEP Rough-In" },
-  { id: "pb6", billing: "6th Progress Billing", date: "2026-06-15", amount: 583054, status: "upcoming", description: "Tiling + Painting" },
-  { id: "pb7", billing: "7th Progress Billing", date: "2026-07-15", amount: 583054, status: "upcoming", description: "Fixtures + Cabinetry" },
-  { id: "pb8", billing: "8th Progress Billing (Final)", date: "2026-08-15", amount: 583054, status: "upcoming", description: "Punchlist + Turnover" },
-  { id: "pb9", billing: "Retention Release", date: "2026-11-15", amount: 291527, status: "upcoming", description: "6-month post-turnover retention" },
+  {
+    id: "pb1",
+    billing: "Billing No. 1 — Downpayment",
+    date: "2025-08-01",
+    amount: 1932417.23,
+    amountDue: 1932417.23,
+    recoupment: 0,
+    status: "paid",
+    pct: 30.0,
+    description: "30% Downpayment. Covers mobilization, site prep, layout, temporary facilities, early excavation & foundation works.",
+    remainingBalance: 4508973.52,
+  },
+  {
+    id: "pb2",
+    billing: "Billing No. 2",
+    date: "2025-11-17",
+    amount: 1138756.93,
+    amountDue: 797129.85,
+    recoupment: -341627.08,
+    status: "paid",
+    pct: 17.68,
+    description: "Structural works: columns, slabs, beams, steel reinforcement, formworks, early masonry & electrical rough-in. Actual billing ₱1,138,756.93 less 30% downpayment recoupment.",
+    remainingBalance: 3711843.67,
+  },
+  {
+    id: "pb3",
+    billing: "Billing No. 3",
+    date: "2026-01-22",
+    amount: 838421.45,
+    amountDue: 586895.01,
+    recoupment: -251526.43,
+    status: "paid",
+    pct: 13.02,
+    description: "2F slab, columns, CHB walls, septic tank, roofing, additional masonry & plumbing works. Actual billing ₱838,421.45 less 30% downpayment recoupment.",
+    remainingBalance: 3122078.51,
+  },
+  {
+    id: "pb4",
+    billing: "Billing No. 4",
+    date: "2026-03-11",
+    amount: null,
+    amountDue: null,
+    recoupment: null,
+    status: "pending",
+    pct: null,
+    description: "To be prepared. Cover works completed since Billing No. 3: roofing completion, GF slab, CHB wall progress, MEP rough-ins.",
+    remainingBalance: null,
+  },
+  {
+    id: "pb5",
+    billing: "Billing No. 5",
+    date: "2026-05-15",
+    amount: null,
+    amountDue: null,
+    recoupment: null,
+    status: "upcoming",
+    pct: null,
+    description: "Walls & plastering, MEP completion, ceiling works, doors & windows installation.",
+    remainingBalance: null,
+  },
+  {
+    id: "pb6",
+    billing: "Billing No. 6",
+    date: "2026-06-30",
+    amount: null,
+    amountDue: null,
+    recoupment: null,
+    status: "upcoming",
+    pct: null,
+    description: "Tiling, floor finishes, painting works.",
+    remainingBalance: null,
+  },
+  {
+    id: "pb7",
+    billing: "Billing No. 7",
+    date: "2026-07-31",
+    amount: null,
+    amountDue: null,
+    recoupment: null,
+    status: "upcoming",
+    pct: null,
+    description: "Fixtures, cabinetry, built-ins, perimeter wall.",
+    remainingBalance: null,
+  },
+  {
+    id: "pb8",
+    billing: "Billing No. 8 — Final",
+    date: "2026-08-25",
+    amount: null,
+    amountDue: null,
+    recoupment: null,
+    status: "upcoming",
+    pct: null,
+    description: "Punchlist completion, final fixtures, turnover.",
+    remainingBalance: null,
+  },
 ];
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -153,9 +244,9 @@ function StatCard({ label, value, sub, accent, icon }) {
 }
 
 function Dashboard({ phaseProgress, setActiveTab }) {
-  const totalBOQ = BOQ_SECTIONS.reduce((s, b) => s + b.total, 0);
-  const paidBillings = PROGRESS_BILLINGS.filter(p => p.status === "paid").reduce((s, b) => s + b.amount, 0);
-  const pendingBillings = PROGRESS_BILLINGS.filter(p => p.status === "pending").reduce((s, b) => s + b.amount, 0);
+  const totalBOQ = TOTAL_CONTRACT;
+  const paidBillings = PROGRESS_BILLINGS.filter(p => p.status === "paid").reduce((s, b) => s + (b.amountDue || 0), 0);
+  const pendingBillings = PROGRESS_BILLINGS.filter(p => p.status === "pending").reduce((s, b) => s + (b.amountDue || 0), 0);
   const overallProgress = Math.round(PHASES.reduce((s, p) => s + (p.weight * (phaseProgress[p.id] || 0)) / 100, 0));
   const urgentOrders = URGENT_PROCUREMENT.filter(p => p.status === "pending" && p.orderBy === "Mar 10").length;
   const daysToTurnover = Math.round((new Date("2026-08-25") - new Date("2026-03-11")) / 86400000);
@@ -177,9 +268,9 @@ function Dashboard({ phaseProgress, setActiveTab }) {
       {/* Stat Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 32 }}>
         <StatCard label="Overall Progress" value={`${overallProgress}%`} sub="vs. 52% planned" accent="#C9A84C" icon="📊" />
-        <StatCard label="Contract Value" value={fmt(totalBOQ)} sub="LLUID Builders BOQ" accent="#2980B9" icon="📄" />
-        <StatCard label="Amount Paid" value={fmt(paidBillings)} sub={`${pct(paidBillings, PROJECT.contractAmount)}% of contract`} accent="#27AE60" icon="✅" />
-        <StatCard label="Pending Billing" value={fmt(pendingBillings)} sub="4th progress billing due" accent="#E67E22" icon="⏳" />
+        <StatCard label="Contract Value" value={fmt(totalBOQ)} sub="Main + Basement Additional" accent="#2980B9" icon="📄" />
+        <StatCard label="Amount Paid (Net)" value={fmt(paidBillings)} sub={`${pct(paidBillings, TOTAL_CONTRACT)}% of contract`} accent="#27AE60" icon="✅" />
+        <StatCard label="Remaining Balance" value={fmt(3122078.51)} sub="As of Billing No. 3" accent="#E67E22" icon="💰" />
         <StatCard label="Days to Turnover" value={daysToTurnover} sub="Target: Aug 25, 2026" accent="#8E44AD" icon="🏁" />
         <StatCard label="Urgent Orders" value={urgentOrders} sub="Must order this week" accent="#E74C3C" icon="🛒" />
       </div>
@@ -366,63 +457,124 @@ function ProcurementTracker() {
 }
 
 function BillingTracker() {
-  const [billings, setBillings] = useState(PROGRESS_BILLINGS);
-  const totalPaid = billings.filter(b => b.status === "paid").reduce((s, b) => s + b.amount, 0);
-  const totalPending = billings.filter(b => b.status === "pending").reduce((s, b) => s + b.amount, 0);
-  const totalContract = billings.reduce((s, b) => s + b.amount, 0);
-
-  const StatusStyle = { paid: ["#14532d", "#86efac", "✅ Paid"], pending: ["#7c2d12", "#fdba74", "⏳ Pending Approval"], upcoming: ["#1e2d3d", "#4a6275", "🔜 Upcoming"] };
+  const [expanded, setExpanded] = useState(null);
+  const totalPaid = PROGRESS_BILLINGS.filter(b => b.status === "paid").reduce((s, b) => s + (b.amountDue || 0), 0);
+  const latestBalance = PROGRESS_BILLINGS.filter(b => b.remainingBalance).slice(-1)[0]?.remainingBalance || 0;
+  const StatusStyle = {
+    paid: ["#14532d", "#86efac", "✅ Paid"],
+    pending: ["#7c2d12", "#fdba74", "⏳ Prepare Now"],
+    upcoming: ["#1e2d3d", "#4a6275", "🔜 Upcoming"]
+  };
 
   return (
     <div style={{ padding: "32px 0" }}>
       <div style={{ color: "#E8C96B", fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Progress Billing Tracker</div>
-      <div style={{ color: "#4a6275", fontSize: 13, marginBottom: 28 }}>Track all billings against contract amount of {fmt(PROJECT.contractAmount)}.</div>
+      <div style={{ color: "#4a6275", fontSize: 13, marginBottom: 28 }}>
+        Total Contract: {fmt(TOTAL_CONTRACT)} (Main Structure {fmt(PROJECT.contractAmount)} + Basement Additional {fmt(BASEMENT_ADDITIONAL)})
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
-        <StatCard label="Total Paid" value={fmt(totalPaid)} sub={`${pct(totalPaid, totalContract)}% of total billings`} accent="#27AE60" icon="✅" />
-        <StatCard label="Pending Approval" value={fmt(totalPending)} sub="4th billing — submit now" accent="#E67E22" icon="⏳" />
-        <StatCard label="Remaining to Bill" value={fmt(totalContract - totalPaid - totalPending)} sub="Future progress billings" accent="#2980B9" icon="📋" />
+      {/* Summary cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 28 }}>
+        <StatCard label="Total Contract" value={fmt(TOTAL_CONTRACT)} sub="Main + Basement" accent="#C9A84C" icon="📄" />
+        <StatCard label="Total Paid (Net)" value={fmt(totalPaid)} sub="After downpayment recoupments" accent="#27AE60" icon="✅" />
+        <StatCard label="Remaining Balance" value={fmt(latestBalance)} sub="As of Billing No. 3" accent="#2980B9" icon="💰" />
+        <StatCard label="Billing No. 4" value="Prepare Now" sub="Not yet submitted" accent="#E74C3C" icon="⏳" />
       </div>
 
       {/* Progress bar */}
       <div style={{ background: "#0f1923", border: "1px solid #1e2d3d", borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-          <span style={{ color: "#9bb5c8", fontSize: 13 }}>Overall Billing Progress</span>
-          <span style={{ color: "#E8C96B", fontSize: 13, fontWeight: 700 }}>{pct(totalPaid, totalContract)}% paid</span>
+          <span style={{ color: "#9bb5c8", fontSize: 13 }}>Amount Paid vs. Total Contract</span>
+          <span style={{ color: "#E8C96B", fontSize: 13, fontWeight: 700 }}>{Math.round(totalPaid / TOTAL_CONTRACT * 100)}% paid to date</span>
         </div>
-        <div style={{ background: "#1e2d3d", borderRadius: 8, height: 16, overflow: "hidden", display: "flex" }}>
-          <div style={{ width: `${pct(totalPaid, totalContract)}%`, background: "#27AE60", transition: "width .5s" }} />
-          <div style={{ width: `${pct(totalPending, totalContract)}%`, background: "#E67E22", transition: "width .5s" }} />
+        <div style={{ background: "#1e2d3d", borderRadius: 8, height: 14, overflow: "hidden" }}>
+          <div style={{ width: `${Math.round(totalPaid / TOTAL_CONTRACT * 100)}%`, height: "100%", background: "linear-gradient(90deg,#27AE60,#2ECC71)", transition: "width .5s" }} />
         </div>
-        <div style={{ display: "flex", gap: 20, marginTop: 10 }}>
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}><div style={{ width: 10, height: 10, background: "#27AE60", borderRadius: 2 }} /><span style={{ color: "#4a6275", fontSize: 11 }}>Paid</span></div>
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}><div style={{ width: 10, height: 10, background: "#E67E22", borderRadius: 2 }} /><span style={{ color: "#4a6275", fontSize: 11 }}>Pending</span></div>
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}><div style={{ width: 10, height: 10, background: "#1e2d3d", borderRadius: 2 }} /><span style={{ color: "#4a6275", fontSize: 11 }}>Upcoming</span></div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+          <span style={{ color: "#27AE60", fontSize: 12 }}>Paid: {fmt(totalPaid)}</span>
+          <span style={{ color: "#4a6275", fontSize: 12 }}>Remaining: {fmt(latestBalance)}</span>
         </div>
       </div>
 
-      <div style={{ background: "#0f1923", border: "1px solid #1e2d3d", borderRadius: 12, overflow: "hidden" }}>
-        {billings.map((b, i) => {
+      {/* Billing cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {PROGRESS_BILLINGS.map((b) => {
           const [bg, col, label] = StatusStyle[b.status];
+          const isOpen = expanded === b.id;
           return (
-            <div key={b.id} style={{ padding: "18px 24px", borderBottom: i < billings.length - 1 ? "1px solid #1e2d3d" : "none", display: "flex", alignItems: "center", gap: 20, background: b.status === "pending" ? "#1a1208" : "transparent" }}>
-              <div style={{ width: 36, height: 36, background: bg, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-                {b.status === "paid" ? "✅" : b.status === "pending" ? "⏳" : "🔜"}
+            <div key={b.id} style={{ background: "#0f1923", border: `1px solid ${b.status === "pending" ? "#7c2d12" : "#1e2d3d"}`, borderRadius: 12, overflow: "hidden" }}>
+              <div onClick={() => setExpanded(isOpen ? null : b.id)}
+                style={{ padding: "18px 24px", display: "flex", alignItems: "center", gap: 16, cursor: "pointer", background: b.status === "pending" ? "#130a06" : "transparent" }}>
+                <div style={{ width: 40, height: 40, background: bg, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                  {b.status === "paid" ? "✅" : b.status === "pending" ? "⏳" : "🔜"}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: "#f0f4f8", fontWeight: 700, fontSize: 14 }}>{b.billing}</div>
+                  <div style={{ color: "#4a6275", fontSize: 12, marginTop: 2 }}>{b.description}</div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  {b.amountDue
+                    ? <div style={{ color: "#E8C96B", fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 700 }}>{fmt(b.amountDue)}</div>
+                    : <div style={{ color: "#4a6275", fontSize: 14, fontStyle: "italic" }}>TBD</div>
+                  }
+                  <div style={{ color: "#4a6275", fontSize: 11, marginTop: 2 }}>{b.date}</div>
+                </div>
+                <div style={{ background: bg, padding: "4px 12px", borderRadius: 20, flexShrink: 0 }}>
+                  <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{label}</span>
+                </div>
+                <div style={{ color: "#4a6275", fontSize: 12 }}>{isOpen ? "▲" : "▼"}</div>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: "#f0f4f8", fontWeight: 700, fontSize: 14 }}>{b.billing}</div>
-                <div style={{ color: "#4a6275", fontSize: 12, marginTop: 2 }}>{b.description}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ color: "#E8C96B", fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 700 }}>{fmt(b.amount)}</div>
-                <div style={{ color: "#4a6275", fontSize: 11, marginTop: 2 }}>{b.date}</div>
-              </div>
-              <div style={{ background: bg, padding: "4px 12px", borderRadius: 20, flexShrink: 0 }}>
-                <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{label}</span>
-              </div>
+
+              {isOpen && b.amount && (
+                <div style={{ padding: "0 24px 20px", borderTop: "1px solid #1e2d3d" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, marginTop: 16 }}>
+                    <div style={{ background: "#121c27", borderRadius: 8, padding: "12px 16px" }}>
+                      <div style={{ color: "#4a6275", fontSize: 11, marginBottom: 4 }}>GROSS BILLING</div>
+                      <div style={{ color: "#f0f4f8", fontWeight: 700, fontSize: 16 }}>{fmt(b.amount)}</div>
+                      <div style={{ color: "#4a6275", fontSize: 11 }}>{b.pct?.toFixed(2)}% of contract</div>
+                    </div>
+                    {b.recoupment !== 0 && (
+                      <div style={{ background: "#121c27", borderRadius: 8, padding: "12px 16px" }}>
+                        <div style={{ color: "#4a6275", fontSize: 11, marginBottom: 4 }}>DOWNPAYMENT RECOUPMENT (30%)</div>
+                        <div style={{ color: "#f87171", fontWeight: 700, fontSize: 16 }}>{fmt(b.recoupment)}</div>
+                        <div style={{ color: "#4a6275", fontSize: 11 }}>Deducted from gross</div>
+                      </div>
+                    )}
+                    <div style={{ background: "#0a1e12", border: "1px solid #14532d", borderRadius: 8, padding: "12px 16px" }}>
+                      <div style={{ color: "#4a6275", fontSize: 11, marginBottom: 4 }}>NET AMOUNT DUE</div>
+                      <div style={{ color: "#86efac", fontWeight: 700, fontSize: 18 }}>{fmt(b.amountDue)}</div>
+                      <div style={{ color: "#4a6275", fontSize: 11 }}>Actual payment made</div>
+                    </div>
+                    {b.remainingBalance && (
+                      <div style={{ background: "#121c27", borderRadius: 8, padding: "12px 16px" }}>
+                        <div style={{ color: "#4a6275", fontSize: 11, marginBottom: 4 }}>REMAINING BALANCE</div>
+                        <div style={{ color: "#93c5fd", fontWeight: 700, fontSize: 16 }}>{fmt(b.remainingBalance)}</div>
+                        <div style={{ color: "#4a6275", fontSize: 11 }}>Still to be billed</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
+      </div>
+
+      {/* Contract breakdown footer */}
+      <div style={{ marginTop: 24, background: "#0f1923", border: "1px solid #1e2d3d", borderRadius: 12, padding: 20 }}>
+        <div style={{ color: "#E8C96B", fontWeight: 700, marginBottom: 12 }}>Contract Breakdown</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            ["Main Structure (LLUID BOQ)", fmt(PROJECT.contractAmount)],
+            ["Basement Additional Works", fmt(BASEMENT_ADDITIONAL)],
+            ["Total Contract Value", fmt(TOTAL_CONTRACT)],
+          ].map(([label, val], i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #1e2d3d" }}>
+              <span style={{ color: i === 2 ? "#f0f4f8" : "#9bb5c8", fontSize: 13, fontWeight: i === 2 ? 700 : 400 }}>{label}</span>
+              <span style={{ color: i === 2 ? "#E8C96B" : "#9bb5c8", fontSize: 13, fontWeight: i === 2 ? 700 : 400 }}>{val}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
